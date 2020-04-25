@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: timeout-rule-vs
+  namespace: eks-poc-istio
+spec:
+  hosts:
+  - "python-backend-service.eks-poc-istio.svc.cluster.local"
+  http:
+  - timeout: 2s
+    route:
+    - destination:
+        host:  "python-backend-service.eks-poc-istio.svc.cluster.local"

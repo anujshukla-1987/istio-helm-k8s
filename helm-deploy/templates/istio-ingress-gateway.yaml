@@ -1,0 +1,42 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: ingress-gateway-configuration
+  namespace: eks-poc-istio
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "my-app.your.hostname.com"
+    tls:
+      httpsRedirect: true # sends 301 redirect for http requests <<<----------------------
+  - port:
+      number: 443
+      name: https
+      protocol: HTTP
+    hosts:
+    - "my-app.your.hostname.com"
+
+---
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: nginx-frontend-gateway-vs
+  namespace: eks-poc-istio
+spec:
+  hosts:
+  - "my-app.your.hostname.com"
+  gateways:
+  - ingress-gateway-configuration
+  http:
+  - route:
+    - destination:
+        host: nginx-frontend-service.eks-poc-istio.svc.cluster.local  # The Target DNS name
+        port:
+          number: 80
+           

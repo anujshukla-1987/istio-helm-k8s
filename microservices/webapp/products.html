@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="ISO-8859-1">
+<title>Product CRUD</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+<script src="view/app.js"></script>
+<style>
+a {
+	cursor: pointer;
+	background-color: lightblue;
+}
+</style>
+</head>
+<body>
+	<div ng-controller="ProductCRUDCtrl">
+			<table>
+				<tr>
+					<td width="100">Product ID:</td>
+					<td><input type="text" id="id" ng-model="product.id" /></td>
+				</tr>
+				<tr>
+					<td width="100">Product Name:</td>
+					<td><input type="text" id="name" ng-model="product.productName" /></td>
+				</tr>
+				<tr>
+					<td width="100">Product Location:</td>
+					<td><input type="text" id="location" ng-model="product.location" /></td>
+				</tr>
+				<tr>
+					<td width="100">Product Price:</td>
+					<td><input type="text" id="price" ng-model="product.price" /></td>
+				</tr>
+				<tr>
+					<td width="100">Product Reservation:</td>
+					<td><input type="checkbox" id="reserved" ng-model="product.reserved" /></td>
+				</tr>
+			</table>
+			<br /> <br /> 
+			<a ng-click="getProduct(product.id)">Get Product</a> 
+			<a ng-click="updateProduct(product)">Update Product</a> 
+			<a ng-click="addProduct(product)">Add Product</a> 
+			<a ng-click="deleteProduct(product.id)">Delete Product</a>
+			<a ng-click="reserveProduct(product.id)">Reserve Product</a>
+			<a ng-click="callNodeMs()">BOOT--NODE</a>
+			<a ng-click="callPyMsFromNode()">BOOT--NODE--PY</a>
+			<a ng-click="callPyMs()">BOOT--PY</a>
+			<a ng-click="callPyMsDirect()">Direct PY</a>
+			<a ng-click="callNodeMsDirect()">Direct Node</a>
+
+		<br /> <br />
+		<p style="color: green">{{message}}</p>
+		<p style="color: red">{{errorMessage}}</p>
+		<br />
+		<br /> 
+		<a ng-click="getAllProducts()">Get all Products</a><br /> 
+		<br /> <br />
+		<div ng-repeat="prd in products">
+			{{prd.id}} {{prd.productName}} {{prd.location}} {{prd.price}} {{prd.reserved}}
+		</div>
+	</div>
+</body>
+</html>

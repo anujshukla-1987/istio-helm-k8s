@@ -1,0 +1,70 @@
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: nodejs-backend-vs  # "just" a name for this virtualservice
+  namespace: eks-poc-istio
+spec:
+  hosts:
+    - nodejs-backend-service.eks-poc-istio.svc.cluster.local  # The Service DNS (ie the regular K8S Service) name that we're applying routing rules to. Best practice of using FQDN
+  http:
+    - route:
+        - destination:
+            host: nodejs-backend-service.eks-poc-istio.svc.cluster.local  # The Target DNS name
+            subset: prod  # The name defined in the DestinationRule
+          weight: 50
+        - destination:
+            host: nodejs-backend-service.eks-poc-istio.svc.cluster.local  # The Target DNS name
+            subset: beta   # The name defined in the DestinationRule
+          weight: 50
+---
+kind: DestinationRule  # Defining which pods should be part of each subset
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: grouping-rule-nodejs-backend-vs  # "just" a name for this destination rule
+  namespace: eks-poc-istio
+spec:
+  host: nodejs-backend-service.eks-poc-istio.svc.cluster.local # The Target DNS name
+  subsets:
+    - labels:  # SELECTOR
+        version: prod # find pods with label "prod"
+      name: prod
+    - labels:
+        version: beta
+      name: beta  
+      
+---
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: python-backend-vs
+  namespace: eks-poc-istio
+spec:
+  hosts:
+    - python-backend-service.eks-poc-istio.svc.cluster.local
+  http:
+    - route:
+        - destination:
+            host: python-backend-service.eks-poc-istio.svc.cluster.local
+            subset: prod
+          weight: 50
+        - destination:
+            host: python-backend-service.eks-poc-istio.svc.cluster.local
+            subset: beta
+          weight: 50
+---
+kind: DestinationRule
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: grouping-rule-python-backend-vs
+  namespace: eks-poc-istio
+spec:
+  host: python-backend-service.eks-poc-istio.svc.cluster.local
+  subsets:
+    - labels:
+        version: prod
+      name: prod
+    - labels:
+        version: beta
+      name: beta       
+          
+

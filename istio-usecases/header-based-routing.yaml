@@ -1,0 +1,40 @@
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: nginx-frontend-gateway-vs
+  namespace: eks-poc-istio
+spec:
+  hosts:
+    - "my-app.mirademo.com"
+  gateways:
+    - ingress-gateway-configuration
+  http:
+    - match:
+      - headers:  # IF
+          my-header:
+            exact: beta
+      route: # THEN
+      - destination:
+          host: nginx-frontend-service.eks-poc-istio.svc.cluster.local
+          subset: beta
+    - route: # CATCH ALL
+      - destination:
+          host: nginx-frontend-service.eks-poc-istio.svc.cluster.local
+          subset: prod
+---
+kind: DestinationRule
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: grouping-rule-nginx-frontend-vs
+  namespace: eks-poc-istio
+spec:
+  host: nginx-frontend-service.eks-poc-istio.svc.cluster.local
+  subsets:
+    - labels:
+        version: prod
+      name: prod
+    - labels:
+        version: beta
+      name: beta       
+          
+

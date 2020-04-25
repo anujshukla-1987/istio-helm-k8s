@@ -1,0 +1,275 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "eks-poc-istio"
+  labels:
+    istio-injection: enabled
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "dynamodb-deployment"
+  namespace: "eks-poc-istio"
+   
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dynamodb-ms
+        tier: database
+        version: prod
+    spec:
+      containers:
+      - name: dynamodb
+        image: anujdockerenvironment/dynamodblocal:1.0  
+        imagePullPolicy: Always     
+        ports:
+        - containerPort: 8000
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "springboot-backend-api-deployment"
+  namespace: "eks-poc-istio"
+     
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: springboot-ms-gateway
+        tier: backend
+        version: prod
+    spec:
+      containers:
+      - name: springboot-backend-api
+        image: anujdockerenvironment/spring-boot-backend:1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "nginx-frontend-deployment"
+  namespace: "eks-poc-istio"
+     
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-frontend-ms
+        tier: frontend
+        version: prod
+    spec:
+      containers:
+      - name: nginx-frontend
+        image: anujdockerenvironment/nginx-frontend:1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "nginx-frontend-deployment-beta"
+  namespace: "eks-poc-istio"
+     
+spec:
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        app: nginx-frontend-ms
+        tier: frontend
+        version: beta
+    spec:
+      containers:
+      - name: nginx-frontend
+        image: anujdockerenvironment/nginx-frontend:1beta
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "nodejs-backend-deployment"
+  namespace: "eks-poc-istio"
+     
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nodejs-backend-ms
+        tier: backend
+        version: prod
+    spec:
+      containers:
+      - name: nodejs-backend
+        image: anujdockerenvironment/nodejs-backend:1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4000
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "nodejs-backend-deployment-beta"
+  namespace: "eks-poc-istio"
+     
+spec:
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        app: nodejs-backend-ms
+        tier: backend
+        version: beta
+    spec:
+      containers:
+      - name: nodejs-backend
+        image: anujdockerenvironment/nodejs-backend:1beta
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4000
+        
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "python-backend-deployment"
+  namespace: "eks-poc-istio"
+     
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: python-backend-ms
+        tier: backend
+        version: prod
+    spec:
+      containers:
+      - name: nodejs-backend
+        image: anujdockerenvironment/python-backend:1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "python-backend-deployment-beta"
+  namespace: "eks-poc-istio"
+     
+spec:
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        app: python-backend-ms
+        tier: backend
+        version: beta
+    spec:
+      containers:
+      - name: nodejs-backend
+        image: anujdockerenvironment/python-backend:1beta
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: "dynamodb-service"
+  namespace: "eks-poc-istio"
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 8000
+    targetPort: 8000
+    name: http
+  selector:
+    app: dynamodb-ms
+    tier: database
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "springboot-ms-gateway-service"
+  namespace: "eks-poc-istio"  
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 8080
+    targetPort: 8080
+    name: http
+  selector:
+    app: springboot-ms-gateway
+    tier: backend
+    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "nginx-frontend-service"
+  namespace: "eks-poc-istio"
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    targetPort: 80
+    name: http
+  type: NodePort
+  selector:
+    app: nginx-frontend-ms
+    tier: frontend
+    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "nodejs-backend-service"
+  namespace: "eks-poc-istio"  
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 4000
+    targetPort: 4000
+    name: http
+  selector:
+    app: nodejs-backend-ms
+    tier: backend
+    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "python-backend-service"
+  namespace: "eks-poc-istio"  
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 5000
+    targetPort: 5000
+    name: http
+  selector:
+    app: python-backend-ms
+    tier: backend
+
+---
